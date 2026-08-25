@@ -1,4 +1,4 @@
 {
-  "startCommand": "yarn dev"
+  "installDependencies": false,
+  "startCommand": "node .yarn/releases/yarn-4.6.0.cjs install && node .yarn/releases/yarn-4.6.0.cjs dev"
 }
-
