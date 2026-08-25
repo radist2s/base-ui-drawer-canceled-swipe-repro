@@ -1,0 +1,36 @@
+diff --git a/drawer/viewport/DrawerViewport.js b/drawer/viewport/DrawerViewport.js
+index 0a2e13cb9927ba546960a01034f66efaab2d3095..2d19dd50e7ee20e0c15d6b0f99c18f8356a7fa65 100644
+--- a/drawer/viewport/DrawerViewport.js
++++ b/drawer/viewport/DrawerViewport.js
+@@ -399,6 +399,13 @@ const DrawerViewport = exports.DrawerViewport = /*#__PURE__*/React.forwardRef(fu
+         }
+         pendingSwipeCloseSnapPointRef.current = activeSnapPoint;
+         setActiveSnapPoint(null, snapPointEventDetails);
++        if (snapPointEventDetails.isCanceled) {
++          // A canceled null snap point rejects dismissal before exit styles start.
++          pendingSwipeCloseSnapPointRef.current = undefined;
++          applySwipeProgress(0, true, true);
++          clearSwipeRelease();
++          return false;
++        }
+         startSwipeRelease(swipeDirection);
+         return true;
+       };
+diff --git a/drawer/viewport/DrawerViewport.mjs b/drawer/viewport/DrawerViewport.mjs
+index db9d3ce870f7fdef97286df12b0d734c847e6cb1..8bb75805693c3f6bf99295a920801141a5e8e7b6 100644
+--- a/drawer/viewport/DrawerViewport.mjs
++++ b/drawer/viewport/DrawerViewport.mjs
+@@ -393,6 +393,13 @@ export const DrawerViewport = /*#__PURE__*/React.forwardRef(function DrawerViewp
+         }
+         pendingSwipeCloseSnapPointRef.current = activeSnapPoint;
+         setActiveSnapPoint(null, snapPointEventDetails);
++        if (snapPointEventDetails.isCanceled) {
++          // A canceled null snap point rejects dismissal before exit styles start.
++          pendingSwipeCloseSnapPointRef.current = undefined;
++          applySwipeProgress(0, true, true);
++          clearSwipeRelease();
++          return false;
++        }
+         startSwipeRelease(swipeDirection);
+         return true;
+       };

@@ -19,7 +19,7 @@
     "vite": "^8.0.0"
   },
   "resolutions": {
-    "@base-ui/react": "https://pkg.pr.new/mui/base-ui/@base-ui/react@903ed2e",
+    "@base-ui/react": "patch:@base-ui/react@https%3A//pkg.pr.new/mui/base-ui/@base-ui/react@903ed2e#~/.yarn/patches/@base-ui-react-https-f037ce4b76.patch",
     "@base-ui/utils": "https://pkg.pr.new/mui/base-ui/@base-ui/utils@903ed2e"
   }
 }

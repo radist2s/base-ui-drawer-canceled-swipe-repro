@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 
 import './styles.css';
 
-const DEMO_VARIANT = 'BROKEN';
+const DEMO_VARIANT = 'FIXED';
 const COLLAPSED_SNAP_POINT = 0.26;
 const EXPANDED_SNAP_POINT = 0.82;
 const SNAP_POINTS = [COLLAPSED_SNAP_POINT, EXPANDED_SNAP_POINT];
@@ -162,4 +162,3 @@ function App() {
 }
 
 createRoot(document.getElementById('root')).render(<App />);
-
