@@ -22,6 +22,7 @@ function startDevServer() {
   }
 
   devServerStarted = true;
+  process.stdout.write('\nStarting Vite after Yarn completed linking.\n');
 
   const devServer = spawn(process.execPath, [yarnPath, 'dev'], {
     stdio: 'inherit',
@@ -36,7 +37,7 @@ function forwardInstallerOutput(chunk, destination) {
   destination.write(chunk);
   installerOutput = `${installerOutput}${chunk.toString()}`.slice(-2048);
 
-  if (installerOutput.includes('YN0000: · Done in')) {
+  if (installerOutput.includes('Done in')) {
     startDevServer();
   }
 }
