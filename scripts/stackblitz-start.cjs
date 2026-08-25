@@ -1,5 +1,5 @@
 const { spawn } = require('node:child_process');
-const { existsSync, unlinkSync } = require('node:fs');
+const { existsSync } = require('node:fs');
 const { join } = require('node:path');
 
 const yarnPath = join(
@@ -8,15 +8,19 @@ const yarnPath = join(
   'releases',
   'yarn-4.6.0.cjs'
 );
-const installStatePath = join(
-  process.cwd(),
-  '.yarn',
-  'install-state.gz'
-);
-
-if (existsSync(installStatePath)) {
-  unlinkSync(installStatePath);
-}
+const linkedFiles = [
+  join(process.cwd(), 'node_modules', 'vite', 'bin', 'vite.js'),
+  join(process.cwd(), 'node_modules', 'react-dom', 'client.js'),
+  join(
+    process.cwd(),
+    'node_modules',
+    '@base-ui',
+    'react',
+    'drawer',
+    'viewport',
+    'DrawerViewport.mjs'
+  ),
+];
 
 // StackBlitz's automatic installer ignores yarnPath and invokes Yarn 1.
 // Run the committed release directly so the fixed branch can use `patch:`.
@@ -32,7 +36,7 @@ function startDevServer() {
   }
 
   devServerStarted = true;
-  clearInterval(installStateWatcher);
+  clearInterval(linkedFilesWatcher);
 
   const devServer = spawn(process.execPath, [yarnPath, 'dev'], {
     stdio: 'inherit',
@@ -43,9 +47,10 @@ function startDevServer() {
   });
 }
 
-const installStateWatcher = setInterval(() => {
-  if (existsSync(installStatePath)) {
-    startDevServer();
+const linkedFilesWatcher = setInterval(() => {
+  if (linkedFiles.every((filePath) => existsSync(filePath))) {
+    clearInterval(linkedFilesWatcher);
+    setTimeout(startDevServer, 100);
   }
 }, 50);
 
