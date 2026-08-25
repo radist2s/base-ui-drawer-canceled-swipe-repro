@@ -15,13 +15,22 @@ The two branches use the same prerelease Base UI artifact and the same app code:
 3. Drag it down quickly and release.
 
 The app synchronously cancels both the proposed `null` snap point and the root
-close request. On the `reproduction` branch, the popup still briefly enters its
-ending style and fades out before returning. On the `fixed` branch, it settles
-back without entering the close animation.
+close request. On the `reproduction` branch, Base UI still proceeds to a root
+close and restoration path, so the popup can briefly fade out before returning.
+On the `fixed` branch, the canceled `null` proposal settles back immediately.
 
-The event log uses `MutationObserver` so the transient `data-ending-style` and
-`data-swipe-dismiss` attributes remain visible as evidence after the frame in
-which they occurred.
+The reliable event-log difference is:
+
+```text
+reproduction: onSnapPointChange(null) canceled
+              onOpenChange(false) canceled
+              onSnapPointChange(0.26) accepted
+
+fixed:        onSnapPointChange(null) canceled
+```
+
+The log also uses `MutationObserver` to retain transient `data-ending-style`
+and `data-swipe-dismiss` changes if a browser exposes them on this path.
 
 ## Dependency setup
 
@@ -34,4 +43,3 @@ protocol. Both branches resolve Base UI to:
 @base-ui/react https://pkg.pr.new/mui/base-ui/@base-ui/react@903ed2e
 @base-ui/utils https://pkg.pr.new/mui/base-ui/@base-ui/utils@903ed2e
 ```
-
