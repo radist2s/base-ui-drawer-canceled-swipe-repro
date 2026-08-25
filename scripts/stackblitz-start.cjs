@@ -1,5 +1,4 @@
 const { spawn } = require('node:child_process');
-const { existsSync } = require('node:fs');
 const { join } = require('node:path');
 
 const yarnPath = join(
@@ -8,27 +7,14 @@ const yarnPath = join(
   'releases',
   'yarn-4.6.0.cjs'
 );
-const linkedFiles = [
-  join(process.cwd(), 'node_modules', 'vite', 'bin', 'vite.js'),
-  join(process.cwd(), 'node_modules', 'react-dom', 'client.js'),
-  join(
-    process.cwd(),
-    'node_modules',
-    '@base-ui',
-    'react',
-    'drawer',
-    'viewport',
-    'DrawerViewport.mjs'
-  ),
-];
-
 // StackBlitz's automatic installer ignores yarnPath and invokes Yarn 1.
 // Run the committed release directly so the fixed branch can use `patch:`.
 const installer = spawn(process.execPath, [yarnPath, 'install'], {
-  stdio: 'inherit',
+  stdio: ['inherit', 'pipe', 'pipe'],
 });
 
 let devServerStarted = false;
+let installerOutput = '';
 
 function startDevServer() {
   if (devServerStarted) {
@@ -36,7 +22,6 @@ function startDevServer() {
   }
 
   devServerStarted = true;
-  clearInterval(linkedFilesWatcher);
 
   const devServer = spawn(process.execPath, [yarnPath, 'dev'], {
     stdio: 'inherit',
@@ -47,12 +32,22 @@ function startDevServer() {
   });
 }
 
-const linkedFilesWatcher = setInterval(() => {
-  if (linkedFiles.every((filePath) => existsSync(filePath))) {
-    clearInterval(linkedFilesWatcher);
-    setTimeout(startDevServer, 100);
+function forwardInstallerOutput(chunk, destination) {
+  destination.write(chunk);
+  installerOutput = `${installerOutput}${chunk.toString()}`.slice(-2048);
+
+  if (installerOutput.includes('YN0000: · Done in')) {
+    startDevServer();
   }
-}, 50);
+}
+
+installer.stdout.on('data', (chunk) => {
+  forwardInstallerOutput(chunk, process.stdout);
+});
+
+installer.stderr.on('data', (chunk) => {
+  forwardInstallerOutput(chunk, process.stderr);
+});
 
 installer.on('exit', () => {
   startDevServer();
