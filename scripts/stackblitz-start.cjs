@@ -7,6 +7,7 @@ const yarnPath = join(
   'releases',
   'yarn-4.6.0.cjs'
 );
+const vitePath = join(process.cwd(), 'node_modules', 'vite', 'bin', 'vite.js');
 // StackBlitz's automatic installer ignores yarnPath and invokes Yarn 1.
 // Run the committed release directly so the fixed branch can use `patch:`.
 const installer = spawn(process.execPath, [yarnPath, 'install'], {
@@ -24,7 +25,7 @@ function startDevServer() {
   devServerStarted = true;
   process.stdout.write('\nStarting Vite after Yarn completed linking.\n');
 
-  const devServer = spawn(process.execPath, [yarnPath, 'dev'], {
+  const devServer = spawn(process.execPath, [vitePath, '--host', '0.0.0.0'], {
     stdio: 'inherit',
   });
 
